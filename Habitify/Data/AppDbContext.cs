@@ -14,7 +14,6 @@ namespace Habitify.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Habit> Habits { get; set; }
-        public DbSet<Category> Categories { get; set; }
 
     }
 }

@@ -21,23 +21,6 @@ namespace Habitify.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Habitify.Models.Category", b =>
-                {
-                    b.Property<int>("CategoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CategoryId");
-
-                    b.ToTable("Categories");
-                });
-
             modelBuilder.Entity("Habitify.Models.Habit", b =>
                 {
                     b.Property<int>("HabitId")
@@ -45,9 +28,6 @@ namespace Habitify.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HabitId"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
 
                     b.Property<string>("HabitName")
                         .IsRequired()
@@ -57,8 +37,6 @@ namespace Habitify.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("HabitId");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("UserId");
 
@@ -77,7 +55,7 @@ namespace Habitify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -92,26 +70,13 @@ namespace Habitify.Migrations
 
             modelBuilder.Entity("Habitify.Models.Habit", b =>
                 {
-                    b.HasOne("Habitify.Models.Category", "Category")
-                        .WithMany("Habits")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Habitify.Models.User", "User")
+                    b.HasOne("Habitify.Models.User", "Users")
                         .WithMany("Habits")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Habitify.Models.Category", b =>
-                {
-                    b.Navigation("Habits");
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Habitify.Models.User", b =>

@@ -1,5 +1,6 @@
 ﻿using Habitify.Data;
 using Habitify.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Habitify.Controllers
@@ -20,6 +21,7 @@ namespace Habitify.Controllers
 
         // GET: HabitsController
         [HttpGet]
+        [Authorize]
         public IActionResult Get()
         {
             return Ok(_context.Habits);
@@ -28,9 +30,13 @@ namespace Habitify.Controllers
 
 
 
+
         [HttpPost]
         public IActionResult Post([FromBody] Habit newHabit)
         {
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             Habit? IsPresent = _context.Habits.FirstOrDefault(h => h.HabitName == newHabit.HabitName);
 
@@ -39,8 +45,10 @@ namespace Habitify.Controllers
 
             _context.Habits.Add(newHabit);
             _context.SaveChanges();
-            return Ok("User Added Successfully!!");
+            return Ok("Habit Added Successfully!!");
         }
+
+
 
 
 
@@ -57,6 +65,8 @@ namespace Habitify.Controllers
             _context.SaveChanges();
             return Ok("Habit Updated Successfully!!");
         }
+
+
 
 
 

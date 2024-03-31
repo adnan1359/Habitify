@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Text.Json.Serialization;
+
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Habitify.Models
 {
@@ -6,14 +9,24 @@ namespace Habitify.Models
     {
         [Key]
         public int HabitId { get; set; }
-        public int UserId { get; set; }  // Foreign key
-        public int CategoryId { get; set; }  // Foreign key
+
+
+        [Required]
         public string HabitName { get; set; }
 
-        // Navigation properties for one-to-many relationships
-        public User User { get; set; }
-        public Category Category { get; set; }
 
+        [ForeignKey("Users")]
+        public int UserId { get; set; }
+        [JsonIgnore]
+        public User? Users { get; set; }
+
+        /*
+        // Navigation properties for one-to-many relationships
+        //[ForeignKey("User")]
+        public int UserId { get; set; }
+        [JsonIgnore]
+        public User User { get; set; }
+        */
 
     }
 }
