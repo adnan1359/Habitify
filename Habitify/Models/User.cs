@@ -14,9 +14,7 @@ namespace Habitify.Models
 
 
 
-        // Navigation properties for one-to-many relationships
         public ICollection<Habit> Habits { get; set; }
-        //public int HabitId { get; set; }
 
         public User()
         {

@@ -1,30 +1,34 @@
 ﻿using Habitify.Data;
 using Habitify.Models;
+using Habitify.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Habitify.Controllers
 {
 
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     public class HabitsController : Controller
     {
-        // GET: UsersController
-        private readonly AppDbContext _context;
 
-        public HabitsController(AppDbContext context)
+        private IHabit _habitrepo;
+
+
+        public HabitsController(AppDbContext context, IHabit h)
         {
-            _context = context;
+            _habitrepo = h;
         }
 
 
         // GET: HabitsController
         [HttpGet]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult Get()
         {
-            return Ok(_context.Habits);
+            return Ok(_habitrepo.Get());
         }
 
 
@@ -32,20 +36,16 @@ namespace Habitify.Controllers
 
 
         [HttpPost]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status208AlreadyReported)]
         public IActionResult Post([FromBody] Habit newHabit)
         {
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (_habitrepo.Post(newHabit) != null)
+                return Ok("Habit Added Successfully!!");
 
-            Habit? IsPresent = _context.Habits.FirstOrDefault(h => h.HabitName == newHabit.HabitName);
-
-            if (IsPresent != null)
-                return StatusCode(StatusCodes.Status208AlreadyReported);
-
-            _context.Habits.Add(newHabit);
-            _context.SaveChanges();
-            return Ok("Habit Added Successfully!!");
+            return StatusCode(StatusCodes.Status208AlreadyReported);
         }
 
 
@@ -53,17 +53,16 @@ namespace Habitify.Controllers
 
 
         [HttpPut]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Put([FromBody] Habit updatedHabit)
         {
 
-            Habit? IsPresent = _context.Habits.FirstOrDefault(h => h.HabitName == updatedHabit.HabitName);
+            if (_habitrepo.Put(updatedHabit) != null)
+                return Ok("Habit Updated Successfully!!");
 
-            if (IsPresent != null)
-                return NotFound();
-
-            _context.Habits.Update(updatedHabit);
-            _context.SaveChanges();
-            return Ok("Habit Updated Successfully!!");
+            return NotFound();
         }
 
 
@@ -71,17 +70,17 @@ namespace Habitify.Controllers
 
 
         [HttpDelete("id")]
-        public IActionResult Delete(int id)
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public IActionResult Delete([FromBody] int id)
         {
 
-            Habit? habitToDelete = _context.Habits.Find(id);
+            if (_habitrepo.Delete(id))
+                return Ok("Habit Deleted Successfully!!");
 
-            if (habitToDelete == null)
-                return NotFound();
-
-            _context.Habits.Remove(habitToDelete);
-            _context.SaveChanges();
-            return Ok("Habit Deleted Successfully!!");
+            return NotFound();
         }
 
 

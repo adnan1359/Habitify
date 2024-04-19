@@ -1,6 +1,7 @@
 ﻿using Habitify.Data;
 using Habitify.Models;
 using Habitify.Repository.Implementation;
+using Habitify.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,79 +13,63 @@ using System.Text;
 
 namespace Habitify.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     public class UsersController : ControllerBase
     {
 
-        private readonly AppDbContext _context;
-        //private readonly UserRepository _repository;
+        private IUser _userrepo;
         private IConfiguration _config;
 
 
-        public UsersController(IConfiguration config, AppDbContext context)
+        public UsersController(IConfiguration config, IUser u)
         {
             _config = config;
-            _context = context;
-            //_repository = repository;
+            _userrepo = u;
         }
 
 
         [HttpPut]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status304NotModified)]
         public IActionResult Put([FromBody] User updatedUser)
         {
-            /*
-            if (_repository.Put(updatedUser))
+            
+            if (_userrepo.Put(updatedUser))
                 return Ok("User Details Updated Successfully!!");
 
             return StatusCode(StatusCodes.Status304NotModified);
-
-            */
-            User? userToUpdate = _context.Users.FirstOrDefault(u => u.Username == updatedUser.Username);
-
-            if (userToUpdate == null)
-                return NotFound();
-
-
-            userToUpdate.Username = updatedUser.Username;
-            userToUpdate.Email = updatedUser.Email;
-            userToUpdate.Password = updatedUser.Password;
-            _context.SaveChanges();
-
-            return Ok("Details Updated Successfully");
             
         }
 
 
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Login([FromBody] User user)
         {
-            var currentUser = _context.Users.FirstOrDefault(u => u.Email == user.Email && u.Password == user.Password);
-            //bool? currentUser = _repository.IsUserPresent(user);
+            
+            bool? currentUser = _userrepo.IsUserPresent(user);
 
             if (currentUser == null)
                 return NotFound();
 
-            // Used to encrypt and decrypt the data
-            //var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
-
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
             if (securityKey.KeySize < 256)
             {
-                // Generate a new security key with a sufficient key size (e.g., 256 bits)
+                
                 securityKey = new SymmetricSecurityKey(new byte[256 / 8]);
             }
 
-            // To Hash our credential key
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Email, user.Email)
             };
 
-            // Initialize the JWT Token Class
             var token = new JwtSecurityToken(
                 issuer: _config["JWT:Issuer"],
                 audience: _config["JWT:Audience"],
@@ -98,87 +83,21 @@ namespace Habitify.Controllers
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-        /*
-        // GET: UsersController/Details/5
-        public ActionResult Details(int id)
+        [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status208AlreadyReported)]
+        public IActionResult Register([FromBody] User newUser)
         {
-            return View();
+            bool? currentUser = _userrepo.IsUserPresent(newUser);
+
+            if (currentUser == false)
+                return StatusCode(StatusCodes.Status208AlreadyReported);
+
+            _userrepo.AddUser(newUser);
+            return Ok("User Registered Successfully!!");
         }
 
-        // GET: UsersController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
 
-        // POST: UsersController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: UsersController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: UsersController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: UsersController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: UsersController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        */
     }
 }

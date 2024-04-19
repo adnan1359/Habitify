@@ -44,5 +44,13 @@ namespace Habitify.Repository.Implementation
             return true;
         }
 
+
+        public User AddUser(User newUser)
+        {
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+            return newUser;
+        }
+
     }
 }

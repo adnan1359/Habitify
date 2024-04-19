@@ -9,5 +9,8 @@ namespace Habitify.Repository.Interface
 
         bool IsUserPresent(User user);
 
+
+        User AddUser(User newUser);
+
     }
 }

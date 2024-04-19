@@ -20,13 +20,5 @@ namespace Habitify.Models
         [JsonIgnore]
         public User? Users { get; set; }
 
-        /*
-        // Navigation properties for one-to-many relationships
-        //[ForeignKey("User")]
-        public int UserId { get; set; }
-        [JsonIgnore]
-        public User User { get; set; }
-        */
-
     }
 }
