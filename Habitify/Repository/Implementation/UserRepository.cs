@@ -19,13 +19,13 @@ namespace Habitify.Repository.Implementation
 
         public bool Put([FromBody] User updatedUser)
         {
-            User? userToUpdate = _context.Users.FirstOrDefault(u => u.Username == updatedUser.Username);
+            User? userToUpdate = _context.Users.FirstOrDefault(u => u.Password == updatedUser.Password);
 
             if (userToUpdate == null)
                 return false;
 
 
-            userToUpdate.Username = updatedUser.Username;
+            //userToUpdate.Username = updatedUser.Username;
             userToUpdate.Email = updatedUser.Email;
             userToUpdate.Password = updatedUser.Password;
             _context.SaveChanges();
@@ -51,6 +51,21 @@ namespace Habitify.Repository.Implementation
             _context.SaveChanges();
             return newUser;
         }
+
+
+        
+        public int GetUserIdByEmail(string email)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            return user.UserId;
+        }
+
+
+        public IEnumerable<User> GetAllUsers()
+        {
+            return _context.Users;
+        }
+        
 
     }
 }

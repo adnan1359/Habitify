@@ -30,6 +30,28 @@ namespace Habitify.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(_userrepo.GetAllUsers());
+        }
+
+
+        [HttpGet("GetUserIdByEmail")]
+        [Authorize]
+        public IActionResult GetUserIdByEmail(string email)
+        {
+            var userId = _userrepo.GetUserIdByEmail(email);
+
+            if (userId == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return Ok(userId);
+        }
+
+
         [HttpPut]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -90,14 +112,28 @@ namespace Habitify.Controllers
         {
             bool? currentUser = _userrepo.IsUserPresent(newUser);
 
-            if (currentUser == false)
+            if (currentUser == true)
                 return StatusCode(StatusCodes.Status208AlreadyReported);
 
             _userrepo.AddUser(newUser);
             return Ok("User Registered Successfully!!");
         }
 
+        /*
+        [HttpGet("GetUserIdByEmail")]
+        [Authorize]
+        public IActionResult GetUserIdByEmail(string email)
+        {
+            var userId = _userrepo.GetUserIdByEmail(email);
 
+            if (userId == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return Ok(userId);
+        }
+    */
 
     }
 }

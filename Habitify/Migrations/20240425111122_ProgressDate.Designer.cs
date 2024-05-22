@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Habitify.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240327052844_m1")]
-    partial class m1
+    [Migration("20240425111122_ProgressDate")]
+    partial class ProgressDate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace Habitify.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HabitId"));
 
+                    b.Property<string>("DateCreated")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("HabitName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -44,6 +47,32 @@ namespace Habitify.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Habits");
+                });
+
+            modelBuilder.Entity("Habitify.Models.Progress", b =>
+                {
+                    b.Property<int>("ProgressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProgressId"));
+
+                    b.Property<string>("DateUpdated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProgressId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserProgress");
                 });
 
             modelBuilder.Entity("Habitify.Models.User", b =>
@@ -62,10 +91,6 @@ namespace Habitify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
@@ -73,18 +98,31 @@ namespace Habitify.Migrations
 
             modelBuilder.Entity("Habitify.Models.Habit", b =>
                 {
-                    b.HasOne("Habitify.Models.User", "Users")
+                    b.HasOne("Habitify.Models.User", "User")
                         .WithMany("Habits")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Habitify.Models.Progress", b =>
+                {
+                    b.HasOne("Habitify.Models.User", "User")
+                        .WithMany("Progresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Habitify.Models.User", b =>
                 {
                     b.Navigation("Habits");
+
+                    b.Navigation("Progresses");
                 });
 #pragma warning restore 612, 618
         }

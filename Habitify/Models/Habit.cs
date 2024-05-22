@@ -15,10 +15,17 @@ namespace Habitify.Models
         public string HabitName { get; set; }
 
 
-        [ForeignKey("Users")]
+        public string DateCreated { get; set; } = DateTime.UtcNow.ToString();
+
+
+
+        [ForeignKey("User")]
         public int UserId { get; set; }
         [JsonIgnore]
-        public User? Users { get; set; }
+        public User User { get; set; }
+
+
+
 
     }
 }

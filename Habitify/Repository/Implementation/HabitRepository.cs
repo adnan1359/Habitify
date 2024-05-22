@@ -40,7 +40,6 @@ namespace Habitify.Repository.Implementation
 
 
 
-
         public Habit Post([FromBody] Habit newHabit)
         {
 

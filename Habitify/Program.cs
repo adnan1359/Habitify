@@ -20,6 +20,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")))
 
 builder.Services.AddScoped<IHabit, HabitRepository>();
 builder.Services.AddScoped<IUser, UserRepository>();
+builder.Services.AddScoped<IProgress, ProgressRepository>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -48,6 +49,13 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+
+
+app.UseCors(options =>
+options.WithOrigins("http://localhost:4200")
+.AllowAnyMethod()
+.AllowAnyHeader());
+
 
 app.UseAuthentication();
 app.UseAuthorization();

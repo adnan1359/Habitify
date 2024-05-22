@@ -12,5 +12,9 @@ namespace Habitify.Repository.Interface
 
         User AddUser(User newUser);
 
+        public int GetUserIdByEmail(string email);
+
+        public IEnumerable<User> GetAllUsers();
+
     }
 }

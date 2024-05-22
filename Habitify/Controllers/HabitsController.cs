@@ -69,18 +69,18 @@ namespace Habitify.Controllers
 
 
 
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public IActionResult Delete([FromBody] int id)
+        public IActionResult Delete(int id)
         {
 
             if (_habitrepo.Delete(id))
                 return Ok("Habit Deleted Successfully!!");
 
-            return NotFound();
+            return NotFound("Element Not Found!!");
         }
 
 
